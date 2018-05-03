@@ -10,7 +10,3 @@
 /vendor/
 /bin/
 /composer.phar
-
-# Backup entities generated with doctrine:generate:entities command
-**/Entity/*~
-.idea
