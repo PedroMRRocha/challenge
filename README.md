@@ -38,3 +38,6 @@ Objectivos:
 1. Todos os resultados destas submissões devem ser guardados em base de dados
 1. Deve haver uma lista com estas submissões para que possam ser posteriormente consultadas
 1. Deve existir uma lista com o top 10 de letras mais recorrentes (globalmente) nas submissões
+
+
+P.S. Usa o git (fora do container) para fazer push para o repositório à medida que fores avançando no desafio.
