@@ -80,6 +80,7 @@ class ChallengeController extends Controller
 
         //var_dump($resultTopTen);
 
+        $topTenLetters = $this->countTopLetters();
 
         $searchHistoryRepo = $this->getDoctrine()->getRepository(SearchHistory::class);
 
@@ -91,8 +92,8 @@ class ChallengeController extends Controller
             'url'        => $data,
             'all_search_results' => $allSearchResults,
             'result_top_ten' => $resultTopTen,
-            'result'        => $result
-            // Add letters
+            'result'        => $result,
+            'top_ten_characters' => $topTenLetters
         ));
 
         echo 'Saved new searchHistory with id ' . $searchHistory->getId();
@@ -113,10 +114,36 @@ class ChallengeController extends Controller
         $result = new SearchHistoryRepository();
 
         $result = SearchHistoryRepository()->createUrlPase($dataToSave);
+    }
 
-        
+    /**
+     * Count the top 10 letters that appeared in the searches
+     * 
+     * @return array
+     */
+    public function countTopLetters()
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $allResults = $entityManager->getRepository(SearchResults::class)->findAll();
 
-        
+        $topTenLetters = array();
 
+        foreach ($allResults as $word) {
+            $letterArray = str_split($word->getWord());
+
+            foreach ($letterArray as $letter) {
+                if( isset($topTenLetters[$letter]) ) {
+                    $topTenLetters[$letter] = $topTenLetters[$letter] + 1;
+                } else {
+                    $topTenLetters[$letter] = 1;
+                }
+            }
+        }
+
+        arsort($topTenLetters, SORT_NUMERIC);
+
+        $topTenLetters = array_slice($topTenLetters, 0, 10);
+
+        return $topTenLetters;
     }
 }

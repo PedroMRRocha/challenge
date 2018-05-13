@@ -54,7 +54,27 @@
                                     {% for searchHistory in all_search_results %}
                                         <tr>
                                             <td><a href="{{ searchHistory.url }}"> {{ searchHistory.url }}</a></td> 
-                                            <td> {{ searchHistory.dateSearched.format('Y/m/d h:m:i') }}</td>
+                                            <td> {{ searchHistory.dateSearched.format('Y/m/d h:i:s') }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>                            
+                        </div>
+                        <div class="letter-counting">
+                            <table>
+                                <thead>
+                                    <th>
+                                        Character
+                                    </th>
+                                    <th>
+                                        Times Occured
+                                    </th>
+                                </th>
+                                <tbody>
+                                    {% for character, times in top_ten_characters %}
+                                        <tr>
+                                            <td> {{ character }} </td> 
+                                            <td> {{ times }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
