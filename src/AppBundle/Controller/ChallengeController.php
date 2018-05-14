@@ -20,7 +20,7 @@ class ChallengeController extends Controller
     public function indexAction(Request $request)
     {
         // replace this example code with whatever you need
-        return $this->render('challenge/index.html.twig');
+        return $this->render('challenge/index.html.twig', array('not_valid' => false));
     }
 
     /**
@@ -31,25 +31,20 @@ class ChallengeController extends Controller
         $data = $_POST['url'];
 
         // Validate url
+        if (!filter_var($data, FILTER_VALIDATE_URL)) { 
+          return $this->render('challenge/index.html.twig', array('not_valid' => true));
+        }
 
-        /////////////////////
-
-
-        //If valid, parse
+        // parse
         $str = file_get_contents($data);
 
         $parseResult = array_count_values(str_word_count(strip_tags(strtolower($str)), 1));
 
-
-
-        //print_r($parseResult);
-        //die();
-
+        // Create Entity 
         $searchHistory = new SearchHistory();
         $searchHistory->setUrl($data);
 
         $searchHistory->setDateSearched(new \Datetime());
-
 
         $entityManager = $this->getDoctrine()->getManager();
 
@@ -64,35 +59,40 @@ class ChallengeController extends Controller
             // relates this searchResults to the category
             $searchResults->setSearchHistory($searchHistory);
 
-            $entityManager = $this->getDoctrine()->getManager();
-
             $entityManager->persist($searchResults);
         }
 
         // actually executes the queries (i.e. the INSERT query)
         $entityManager->flush();
 
-        $result = $entityManager->getRepository(SearchResults::class)
-            ->findAllOrderedByTimesOccured();
+        // Get all words for search - we could have just used $parseResult
+        $allWordsSearch = $entityManager->getRepository(SearchResults::class)
+            ->findAllOrderedByTimesOccured($searchHistory->getId());
 
+        //Get top Ten words from database - we could have applied same thinking as characters, but it'd be costly to order thousands of words - let's
+        //retrieve immediatly from the DB what we want as it's a simple query
         $resultTopTen = $entityManager->getRepository(SearchResults::class)
             ->findAllTopTenWords($searchHistory->getId());
 
-        //var_dump($resultTopTen);
+        $resultTopTenArray = array();
 
+        foreach ($resultTopTen as $result) {
+            $resultTopTenArray[$result->getWord()] = $result->getTimesRepeated();
+        }
+
+        // Get top Ten Letters from all words
         $topTenLetters = $this->countTopLetters();
 
         $searchHistoryRepo = $this->getDoctrine()->getRepository(SearchHistory::class);
 
+        //Get all searches made so far
         $allSearchResults =  $searchHistoryRepo->findAll();
-
-        //var_dump($allSearchResults);
 
         return $this->render('challenge/results.html.twig', array(
             'url'        => $data,
             'all_search_results' => $allSearchResults,
-            'result_top_ten' => $resultTopTen,
-            'result'        => $result,
+            'result_top_ten' => $resultTopTenArray,
+            'result'        => $allWordsSearch,
             'top_ten_characters' => $topTenLetters
         ));
 

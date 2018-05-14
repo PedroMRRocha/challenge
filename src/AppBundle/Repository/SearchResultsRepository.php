@@ -12,13 +12,13 @@ use Doctrine\ORM\EntityRepository;
  */
 class SearchResultsRepository extends \Doctrine\ORM\EntityRepository
 {
-	public function findAllOrderedByTimesOccured()
+	public function findAllOrderedByTimesOccured($searchHistoyrId)
     {
-        return $this->getEntityManager()
-            ->createQuery(
-                'SELECT p FROM AppBundle:SearchResults p ORDER BY p.timesRepeated DESC'
-            )
-            ->getResult();
+        $entityManager = $this->getEntityManager();
+    	$query = $entityManager->createQuery('SELECT p FROM AppBundle:SearchResults p WHERE p.searchHistoryId = :search_history_id ORDER BY p.timesRepeated DESC');
+    	$query->setParameter('search_history_id', $searchHistoyrId);
+		$data = $query->getResult();
+        return $data;
     }
 
     public function findAllTopTenWords($searchHistoyrId)
