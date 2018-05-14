@@ -20,7 +20,7 @@
                             <div class="form">
                                 <form id="url_form" method="post" action="/app_dev.php/challenge/parse-url">
                                     {% if not_valid == true %}
-                                        <p>Please paste a valid URL.</p>
+                                        <p>There was an error. Either the URL was invalid or there was a problem fetching the page.</p>
                                     {% endif %}
                                     <label for="url">
                                         Paste URL to parse:

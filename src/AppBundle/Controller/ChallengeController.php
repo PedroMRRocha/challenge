@@ -26,6 +26,9 @@ class ChallengeController extends Controller
      */
     public function parseUrlAction(Request $request)
     {
+        if (!isset($_POST['url'])) {
+            return $this->render('challenge/index.html.twig', array('not_valid' => true));
+        }
         $data = $_POST['url'];
 
         // Validate url
