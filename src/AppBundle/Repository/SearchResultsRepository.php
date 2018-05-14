@@ -12,7 +12,14 @@ use Doctrine\ORM\EntityRepository;
  */
 class SearchResultsRepository extends \Doctrine\ORM\EntityRepository
 {
-	public function findAllOrderedByTimesOccured($searchHistoyrId)
+		/**
+		 * Get results of search for a specific SearchHistory
+		 * 
+		 * @param  integer $searchHistoyrId
+		 * 
+		 * @return Object                  
+		 */
+	public function findOrderedByTimesOccuredBySeachHistoryId($searchHistoyrId)
     {
         $entityManager = $this->getEntityManager();
     	$query = $entityManager->createQuery('SELECT p FROM AppBundle:SearchResults p WHERE p.searchHistoryId = :search_history_id ORDER BY p.timesRepeated DESC');
@@ -21,6 +28,13 @@ class SearchResultsRepository extends \Doctrine\ORM\EntityRepository
         return $data;
     }
 
+    /**
+     * Get top ten words of search results with searchHistoryId
+     * 
+     * @param  integer $searchHistoyrId 
+     * 
+     * @return Object                  
+     */
     public function findAllTopTenWords($searchHistoyrId)
     {
     	$entityManager = $this->getEntityManager();

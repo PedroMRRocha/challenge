@@ -10,8 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-//require('jpgraph/jpgraph.php');
-
 class ChallengeController extends Controller
 {
     /**
@@ -35,9 +33,13 @@ class ChallengeController extends Controller
           return $this->render('challenge/index.html.twig', array('not_valid' => true));
         }
 
-        // parse
+        // parse - This still might fall as the filter_var might fail validating the URL
         $str = file_get_contents($data);
 
+        /*
+        This will parse the result.
+        It will lower all words, get rid of html tags and finally count each word and save it in an array with the number of times it occurs
+         */
         $parseResult = array_count_values(str_word_count(strip_tags(strtolower($str)), 1));
 
         // Create Entity 
@@ -67,7 +69,7 @@ class ChallengeController extends Controller
 
         // Get all words for search - we could have just used $parseResult
         $allWordsSearch = $entityManager->getRepository(SearchResults::class)
-            ->findAllOrderedByTimesOccured($searchHistory->getId());
+            ->findOrderedByTimesOccuredBySeachHistoryId($searchHistory->getId());
 
         //Get top Ten words from database - we could have applied same thinking as characters, but it'd be costly to order thousands of words - let's
         //retrieve immediatly from the DB what we want as it's a simple query
@@ -88,6 +90,7 @@ class ChallengeController extends Controller
         //Get all searches made so far
         $allSearchResults =  $searchHistoryRepo->findAll();
 
+        //Render view with results
         return $this->render('challenge/results.html.twig', array(
             'url'        => $data,
             'all_search_results' => $allSearchResults,
@@ -95,25 +98,6 @@ class ChallengeController extends Controller
             'result'        => $allWordsSearch,
             'top_ten_characters' => $topTenLetters
         ));
-
-        echo 'Saved new searchHistory with id ' . $searchHistory->getId();
-
-        die();
-
-        //Clean some results maybe ?
-
-        ////////
-
-        //Prepare data to insert in database
-
-        $dataToSave = array(
-            'url' => $data,
-            'words' => $parseResult
-        );
-
-        $result = new SearchHistoryRepository();
-
-        $result = SearchHistoryRepository()->createUrlPase($dataToSave);
     }
 
     /**
